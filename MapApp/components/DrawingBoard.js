@@ -1,11 +1,12 @@
-import { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { View, PanResponder, StyleSheet } from "react-native";
 import { Svg, Path } from "react-native-svg";
 
 const DrawingBoard = forwardRef((props, ref) => {
   const [currentPoints, setCurrentPoints] = useState([]);
   const [lines, setLines] = useState([]);
-  const path = useRef(null);
+  const path = useRef("");
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -25,11 +26,40 @@ const DrawingBoard = forwardRef((props, ref) => {
         }
       },
       onPanResponderRelease: () => {
-        setLines(lines => [...lines, path.current]);
         setCurrentPoints([]);
+        setLines([...lines, path.current]);
+        path.current = "";
       }
     })
   ).current;
+
+  useEffect(() => {
+    const points = extractPoints();
+    if (points.length !== 0) {
+      sendDataToParent(points);
+    }
+    // console.log("Points:", points);
+  }, [lines]);
+
+  const extractPoints = () => {
+    return lines.map((line) => {
+      const points = [];
+      const regex = /([0-9.-]+),([0-9.-]+)/g;
+      let match;
+      while ((match = regex.exec(line))) {
+        const x = parseFloat(match[1]);
+        const y = parseFloat(match[2]);
+        points.push({ x, y });
+      }
+      return points;
+    });
+  };
+
+  const sendDataToParent = (points) => {
+    if (props.onData) {
+      props.onData(points);
+    }
+  };
 
   // Expose the clearBoard function to the parent component
   useImperativeHandle(ref, () => ({
