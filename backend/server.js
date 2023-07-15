@@ -5,18 +5,10 @@ const express = require('express');
 const app  = express();
 app.use(express.json());
 
-// Mount the mapPointsRoutes
-// app.use('/api/mapPoints', mapPointsRoutes);
 
 // Start the server
 app.listen(8080, () => {
   console.log('Server is running on port 8080');
-});
-
-// Verify that server is activated
-app.get('/', (req,res) => {
-  console.log("Server is up at port 8080!");
-  res.send('<h1>MongoDB server is up!</h1>');
 });
 
 // MongoDB connection URI
@@ -34,31 +26,55 @@ client.connect(err => {
   }
 });
 
+// Verify that server is activated
+app.get('/', (req,res) => {
+  console.log("Server is up at port 8080!");
+  res.send('<h1>MongoDB server is up!</h1>');
+});
+
+// Retrieve data from MongoDB
+// Retrieve data from MongoDB
+app.get('/get-points', async (req, res) => {
+  try {
+    const collection = client.db('MapApp').collection('mapPoints');
+    const cursor = collection.find({});
+    const data = await cursor.toArray();
+    console.log(data);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching map points:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Insert the points of the drawn map in the mongoDB as a single File containing all these points
 app.post('/insert-points', async (req, res) => {
   try {
-    // const points = req.body.points;
     console.log("Points from server side:");
-    console.log(req.body[0][0]);
+    console.log(req.body);
 
     const collection = client.db('MapApp').collection('mapPoints');
-    for(rec of req.body[0]){
-      await collection.insertOne(rec);
-      console.log('Points inserted successfully:', rec);  
+    
+    for (const mapKey in req.body) {
+      const points = req.body[mapKey];
+      const currentDate = new Date(); // Get the current date
+      const mapData = {
+        "points": points,
+        date: currentDate // Add the current date to the mapData object
+      };
+
+      await collection.insertOne(mapData);
+      console.log(`Points inserted successfully for map ${mapKey}:`, mapData);
     }
 
-    // res.status(200).json({ message: 'Points inserted successfully' });
+    res.status(200).json({ message: 'Points inserted successfully' });
   } catch (error) {
     console.error('Error inserting map points:', error);
     res.status(500).json({ error: 'Failed to insert map points' });
   }
 });
 
-
-
-// Insert map points into the database
-const insertMapPoints = async (points) => {
-  
-};
 
 // app.get('/insert-points', async (req, res) => {
 //   try {

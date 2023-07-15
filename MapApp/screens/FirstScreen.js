@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+// FirstScreen.js
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { SERVER_ADDR } from '../server_path';
 import { Ionicons } from '@expo/vector-icons';
 import DrawingBoard from '../components/DrawingBoard';
 
-function FirstScreen() {
+function FirstScreen({ navigation }) {
   const [points, setPoints] = useState([]);
+  const [lines, setLines] = useState([]);
   const drawingBoardRef = useRef(null);
 
   const clearMap = () => {
@@ -15,31 +17,15 @@ function FirstScreen() {
     }
   };
 
-  const connection = async () => {
-    try {
-      const res = await axios.get(`http://${SERVER_ADDR}`);
-      console.log("Connection successfully established!", res);
-    } catch (error) {
-      console.log("Failed to connect:", error);
-    }
-  };
-  
-
-  async function savePointsToDatabase(points){
+  async function savePointsToDatabase(points) {
     console.log("Points from save points", points);
     try {
-      // const data = JSON.parse(points[0]);
-      // console.log('Parsed JSON:', data);
-      await axios
-        .post(`http://${SERVER_ADDR}/insert-points/`, points)
-        .then((response) => {
-          console.log('Points saved successfully', response);
-        })
-        .catch((error) => {
-          console.error('Error saving points:', error);
-        });
+      await axios.post(`http://${SERVER_ADDR}/insert-points/`, points);
+      console.log('Points saved successfully');
+      const newLines = points.map((point) => `L${point.x},${point.y}`).join('');
+      setLines([...lines, newLines]);
     } catch (error) {
-      console.error('Error parsing JSON:', error);
+      console.error('Error saving points:', error);
     }
   };
 
@@ -52,10 +38,6 @@ function FirstScreen() {
     console.log(points);
     savePointsToDatabase(points);
   };
-  
-  useEffect(() => {
-    console.log("Points to JSON: ",points);
-  })
 
   return (
     <View style={styles.root}>
@@ -76,14 +58,10 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     justifyContent: 'center',
-    //alignItems: 'center'
   },
   drawingContainer: {
     flex: 1,
     width: '100%',
-  },
-  map: {
-    flex: 1,
   },
   buttonContainer: {
     flexDirection: 'row',

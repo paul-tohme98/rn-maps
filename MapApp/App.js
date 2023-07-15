@@ -18,7 +18,25 @@ function App(){
     <>
       <StatusBar style='auto' />
       <NavigationContainer>
-        <Tab.Navigator>
+        <Tab.Navigator
+          tabBarOptions={{
+            activeTintColor: 'red', // Define the active icon color
+            inactiveTintColor: 'blue', // Define the inactive icon color
+          }}
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ color, size, focused }) => {
+              // Customize the icon color based on whether it is focused (pressed) or not
+              let iconColor = focused ? 'red' : 'blue';
+              
+              if (route.name === "Maps") {
+                return <MaterialCommunityIcons name="google-maps" size={24} color={iconColor} />;
+              }
+              // Add more cases for other icons
+
+              return null;
+            },
+          })}
+        >
           <Tab.Screen 
             name="Maps" 
             component={FirstScreen} 
