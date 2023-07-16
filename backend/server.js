@@ -33,8 +33,7 @@ app.get('/', (req,res) => {
 });
 
 // Retrieve data from MongoDB
-// Retrieve data from MongoDB
-app.get('/get-points', async (req, res) => {
+app.get('/get-maps', async (req, res) => {
   try {
     const collection = client.db('MapApp').collection('mapPoints');
     const cursor = collection.find({});
@@ -46,6 +45,32 @@ app.get('/get-points', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get('/get-maps/points', async (req, res) => {
+  try{
+    const db = client.db('MapApp');
+    const collection = db.collection('mapPoints');
+
+  // Find the document with the latest date
+    collection.findOne({}, { sort: { ['date']: -1 } })
+      .then((latestDocument) => {
+        if (latestDocument) {
+          console.log("Document with the latest date:", latestDocument);
+          res.json(latestDocument);
+          return latestDocument;
+        } else {
+          console.log("No documents found.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching data from MongoDB:", err);
+        client.close();
+      });
+  }
+  catch(err){
+    console.log("Failed to fetch latest document", err);
+  }
+})
 
 
 // Insert the points of the drawn map in the mongoDB as a single File containing all these points
@@ -74,20 +99,6 @@ app.post('/insert-points', async (req, res) => {
     res.status(500).json({ error: 'Failed to insert map points' });
   }
 });
-
-
-// app.get('/insert-points', async (req, res) => {
-//   try {
-//     const collection = client.db('MapApp').collection('mapPoints');
-//     const result = await collection.findOne({});
-//     console.log("Record found");
-//     return result?.points || [];
-//   } catch (error) {
-//     throw new Error('Error fetching map points:', error);
-//   }
-// });
-
-
 
 // Delete map points from the database
 const deleteMapPoints = async () => {
