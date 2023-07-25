@@ -72,6 +72,16 @@ app.get('/get-maps/points', async (req, res) => {
   }
 })
 
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Adding 1 to month since it is zero-based
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 
 // Insert the points of the drawn map in the mongoDB as a single File containing all these points
 app.post('/insert-points', async (req, res) => {
@@ -84,9 +94,10 @@ app.post('/insert-points', async (req, res) => {
     for (const mapKey in req.body) {
       const points = req.body[mapKey];
       const currentDate = new Date(); // Get the current date
+      const actualDate = formatDate(currentDate);
       const mapData = {
         "points": points,
-        date: currentDate // Add the current date to the mapData object
+        date: actualDate // Add the current date to the mapData object
       };
 
       await collection.insertOne(mapData);

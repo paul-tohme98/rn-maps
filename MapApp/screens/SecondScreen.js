@@ -5,50 +5,48 @@ import axios from 'axios';
 import SVGDrawBoard from '../components/SVGDrawBoard';
 import { SERVER_ADDR } from '../server_path';
 
+const api = axios.create({
+  baseURL: `http://${SERVER_ADDR}`,
+});
 
-function SecondScreen(){
-
+function SecondScreen() {
   const [points, setPoints] = useState([]);
 
-  const handleDrag = () => {
-    // Logic to handle pin drag
-  };
-
   async function fetchPoints() {
-    console.log("Points from save points", points);
     try {
-      const res = await axios.get(`http://${SERVER_ADDR}/get-maps/points`);
-      console.log("fetch points ", res.data.points);
-      setPoints(res.data.points);
-      console.log('Points fetched successfully', res.data.points);
+      const res = await api.get('/get-maps/points');
+      const dataPoints = res?.data?.points || [];
+      console.log('fetch points ', dataPoints);
+      setPoints(dataPoints);
+      console.log('Points fetched successfully', dataPoints);
     } catch (error) {
-      console.error('Error saving points:', error);
+      console.error('Error fetching points in screen 2:', error);
     }
-  };
+  }
 
   useEffect(() => {
-    try{
-      fetchPoints();
-    }
-    catch(err){
-      console.log(err);
-    }
-  }, []);
+    fetchPoints()
+      .then((res) => {
+        console.log("Points re-rendered : ", points);
+      })
+      .catch((error) => {
+        console.error('Error fetching points in screen 2:', error);
+      });
+  }, [points]);
 
   return (
     <View style={styles.root}>
       {/* Map Component with draggable pin */}
-      <SVGDrawBoard points={points} />
-      <Text>Pin Position: X, Y</Text>
+        <SVGDrawBoard points={points} />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  root: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  root: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

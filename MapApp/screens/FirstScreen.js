@@ -35,7 +35,7 @@ function FirstScreen({ navigation }) {
 
   const handleSavePoints = () => {
     console.log("Saving...");
-    console.log(points);
+    //console.log(points);
     savePointsToDatabase(points);
   };
 

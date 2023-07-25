@@ -1,11 +1,15 @@
-import { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react";
-import { View, PanResponder, StyleSheet } from "react-native";
+import React, { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import { View, PanResponder, StyleSheet, Dimensions } from "react-native";
 import { Svg, Path } from "react-native-svg";
 
 const DrawingBoard = forwardRef((props, ref) => {
   const [currentPoints, setCurrentPoints] = useState([]);
   const [lines, setLines] = useState([]);
   const path = useRef("");
+
+  const { width, height } = Dimensions.get('window');
+  const svgWidth = width;
+  const svgHeight = height * 0.9; // Adjust height to 90% of screen height
 
   const panResponder = useRef(
     PanResponder.create({
@@ -14,15 +18,18 @@ const DrawingBoard = forwardRef((props, ref) => {
         path.current = "";
       },
       onPanResponderMove: (event, gestureState) => {
+        const x = gestureState.moveX * (svgWidth / width); // Scale the X coordinate
+        const y = gestureState.moveY * (svgHeight / height); // Scale the Y coordinate
+
         const newPoint = {
-          x: gestureState.moveX,
-          y: gestureState.moveY
+          x,
+          y
         };
         setCurrentPoints([...currentPoints, newPoint]);
         if (path.current === "") {
-          path.current = `M${newPoint.x},${newPoint.y}`;
+          path.current = `M${x},${y}`;
         } else {
-          path.current += `L${newPoint.x},${newPoint.y}`;
+          path.current += `L${x},${y}`;
         }
       },
       onPanResponderRelease: () => {
@@ -71,7 +78,7 @@ const DrawingBoard = forwardRef((props, ref) => {
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
-      <Svg style={styles.svg}>
+      <Svg style={styles.svg} width={svgWidth} height={svgHeight}>
         {lines.map((line, index) => (
           <Path key={index} d={line} stroke="black" strokeWidth="4" fill="green" />
         ))}
