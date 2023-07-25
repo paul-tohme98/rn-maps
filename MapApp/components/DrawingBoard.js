@@ -9,7 +9,7 @@ const DrawingBoard = forwardRef((props, ref) => {
 
   const { width, height } = Dimensions.get('window');
   const svgWidth = width;
-  const svgHeight = height * 0.9; // Adjust height to 90% of screen height
+  const svgHeight = height * 0.8; // Adjust height to 90% of screen height
 
   const panResponder = useRef(
     PanResponder.create({

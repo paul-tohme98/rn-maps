@@ -38,7 +38,7 @@ app.get('/get-maps', async (req, res) => {
     const collection = client.db('MapApp').collection('mapPoints');
     const cursor = collection.find({});
     const data = await cursor.toArray();
-    console.log(data);
+    //console.log(data);
     res.json(data);
   } catch (error) {
     console.error('Error fetching map points:', error);
@@ -55,7 +55,7 @@ app.get('/get-maps/points', async (req, res) => {
     collection.findOne({}, { sort: { ['date']: -1 } })
       .then((latestDocument) => {
         if (latestDocument) {
-          console.log("Document with the latest date:", latestDocument);
+          //console.log("Document with the latest date:", latestDocument);
           res.json(latestDocument);
           return latestDocument;
         } else {
@@ -86,8 +86,8 @@ function formatDate(date) {
 // Insert the points of the drawn map in the mongoDB as a single File containing all these points
 app.post('/insert-points', async (req, res) => {
   try {
-    console.log("Points from server side:");
-    console.log(req.body);
+    //console.log("Points from server side:");
+    //console.log(req.body);
 
     const collection = client.db('MapApp').collection('mapPoints');
     
@@ -101,7 +101,7 @@ app.post('/insert-points', async (req, res) => {
       };
 
       await collection.insertOne(mapData);
-      console.log(`Points inserted successfully for map ${mapKey}:`, mapData);
+      //console.log(`Points inserted successfully for map ${mapKey}:`, mapData);
     }
 
     res.status(200).json({ message: 'Points inserted successfully' });
@@ -114,7 +114,7 @@ app.post('/insert-points', async (req, res) => {
 // Delete map points from the database
 const deleteMapPoints = async () => {
     try {
-      const collection = client.db('<database>').collection('mapPoints');
+      const collection = client.db('MapApp').collection('mapPoints');
       await collection.deleteMany({});
     } catch (error) {
       throw new Error('Error deleting map points:', error);
@@ -124,7 +124,7 @@ const deleteMapPoints = async () => {
 // Fetch map points from the database
 const fetchMapPoints = async () => {
     try {
-      const collection = client.db('<database>').collection('mapPoints');
+      const collection = client.db('MapApp').collection('mapPoints');
       const result = await collection.findOne({});
       return result?.points || [];
     } catch (error) {

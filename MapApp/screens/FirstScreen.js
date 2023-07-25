@@ -18,7 +18,7 @@ function FirstScreen({ navigation }) {
   };
 
   async function savePointsToDatabase(points) {
-    console.log("Points from save points", points);
+    //console.log("Points from save points", points);
     try {
       await axios.post(`http://${SERVER_ADDR}/insert-points/`, points);
       console.log('Points saved successfully');
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '10%',
+    marginVertical: '10%',
     marginHorizontal: '10%',
   },
 });

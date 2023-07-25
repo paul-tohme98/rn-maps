@@ -16,9 +16,9 @@ function SecondScreen() {
     try {
       const res = await api.get('/get-maps/points');
       const dataPoints = res?.data?.points || [];
-      console.log('fetch points ', dataPoints);
+      //console.log('fetch points ', dataPoints);
       setPoints(dataPoints);
-      console.log('Points fetched successfully', dataPoints);
+      //console.log('Points fetched successfully', dataPoints);
     } catch (error) {
       console.error('Error fetching points in screen 2:', error);
     }
@@ -27,7 +27,7 @@ function SecondScreen() {
   useEffect(() => {
     fetchPoints()
       .then((res) => {
-        console.log("Points re-rendered : ", points);
+        //console.log("Points re-rendered");
       })
       .catch((error) => {
         console.error('Error fetching points in screen 2:', error);
